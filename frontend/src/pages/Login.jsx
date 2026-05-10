@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { login } from "../api";
 
 function Login() {
   const navigate = useNavigate();
@@ -11,13 +12,23 @@ function Login() {
   const [showPassword, setShowPassword] = useState(false);
 
   // Handle Login
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (!email || !password) {
-      alert("Please fill all fields");
-      return;
+    alert("Please fill all fields");
+    return;
     }
-
-    navigate("/home");
+    try {
+      const data = await login(email, password);
+      if (data.token) {
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("user", JSON.stringify(data.user));
+        navigate("/home");
+      } else {
+        alert(data.detail || "Login failed");
+      }
+    } catch (err) {
+      alert("Something went wrong!");
+    }
   };
 
   return (
