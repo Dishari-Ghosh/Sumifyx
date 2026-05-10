@@ -12,7 +12,9 @@ app = FastAPI(title="SumifyX API")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # specific origin, not *
+    allow_origins=["http://localhost:5173",
+                  "https://sumifyx.onrender.com"
+                  ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
