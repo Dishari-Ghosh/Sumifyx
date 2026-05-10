@@ -2,41 +2,56 @@ import Header from "../components/Header";
 import UploadPDF from "../components/UploadPDF";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { uploadPDF } from "../api";
 
 function Home() {
   const navigate = useNavigate();
 
   const [purpose, setPurpose] = useState("study_material");
-  const [summaryType, setSummaryType] = useState("short");
   const [darkMode, setDarkMode] = useState(false);
   const [pdfFile, setPdfFile] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
     if (!pdfFile) {
       alert("Please upload a PDF!");
       return;
     }
 
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      alert("Please login first!");
+      navigate("/");
+      return;
+    }
+
     setLoading(true);
 
-    setTimeout(() => {
-      let inputText = "Content extracted from uploaded PDF";
-      let result = "Summary: " + inputText.slice(0, 60) + "...";
+    try {
+      const data = await uploadPDF(pdfFile, purpose, token);
 
-      const mcqs = "Generated MCQs will come here";
-
-      navigate("/result", {
-  state: {
-    summary: result,
-    mcqs,
-    purpose,
-    darkMode
-  }
-});
-
+      if (data.notes) {
+        navigate("/result", {
+          state: {
+            summary: data.notes,
+            mcqs: data.mcqs,
+            images: data.images,
+            purpose,
+            darkMode,
+            total_pages: data.total_pages,
+            mcq_count: data.mcq_count
+          }
+        });
+      } else {
+        alert(data.detail || "Something went wrong!");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Upload failed!");
+    } finally {
       setLoading(false);
-    }, 1200);
+    }
   };
 
   return (
@@ -44,7 +59,6 @@ function Home() {
       style={{
         minHeight: "100vh",
 
-        /* BACKGROUND SWITCH */
         backgroundImage: darkMode
           ? "url('/HomeDark_bg.jpg')"
           : "url('/HomeLight_bg.jpg')",
@@ -53,7 +67,6 @@ function Home() {
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
 
-        /* TEXT COLOR */
         color: darkMode ? "#ffffff" : "#0f172a",
 
         transition: "all 0.3s ease"
@@ -73,7 +86,6 @@ function Home() {
           gap: "40px"
         }}
       >
-
         {/* TITLE */}
         <h2
           style={{
@@ -137,7 +149,6 @@ function Home() {
             justifyContent: "center",
             flexDirection: "column",
 
-            /* GLASS EFFECT */
             background: darkMode
               ? "rgba(15,23,42,0.6)"
               : "rgba(255,255,255,0.6)",
@@ -150,29 +161,27 @@ function Home() {
 
         {/* BUTTON */}
         <button
-  onClick={handleGenerate}
-  style={{
-    width: "300px",
-    padding: "16px",
+          onClick={handleGenerate}
+          style={{
+            width: "300px",
+            padding: "16px",
 
-    /* DIFFERENT COLORS */
-    background: darkMode
-      ? "linear-gradient(to right, #6366f1, #8b5cf6)"   // DARK MODE (purple-blue)
-      : "linear-gradient(to right, #ff91a4, #d05d74)",  // LIGHT MODE (blue-green)
+            background: darkMode
+              ? "linear-gradient(to right, #6366f1, #8b5cf6)"
+              : "linear-gradient(to right, #ff91a4, #d05d74)",
 
-    color: darkMode ? "#cbd5f5" : "#334155",
-    border: "none",
-    borderRadius: "12px",
-    fontWeight: "bold",
-    fontSize: "18px",
-    cursor: "pointer",
-    opacity: loading ? 0.6 : 1
-  }}
-  disabled={loading}
->
-  {loading ? "Processing..." : "SUMMARIZE"}
-</button>
-
+            color: darkMode ? "#cbd5f5" : "#334155",
+            border: "none",
+            borderRadius: "12px",
+            fontWeight: "bold",
+            fontSize: "18px",
+            cursor: "pointer",
+            opacity: loading ? 0.6 : 1
+          }}
+          disabled={loading}
+        >
+          {loading ? "Processing..." : "SUMMARIZE"}
+        </button>
       </div>
     </div>
   );
