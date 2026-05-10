@@ -26,7 +26,7 @@ function Login() {
       } else {
         alert(data.detail || "Login failed");
       }
-    } catch (err) {
+    } catch {
       alert("Something went wrong!");
     }
   };
