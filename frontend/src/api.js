@@ -1,4 +1,4 @@
-const BASE_URL = "https://sumifyx-production.up.railway.app";
+const BASE_URL = "https://sumifyx-production.up.railway.app/";
 export const signup = async (name, email, password) => {
   const res = await fetch(`${BASE_URL}/auth/signup`, {
     method: "POST",
