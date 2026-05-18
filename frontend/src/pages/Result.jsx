@@ -128,22 +128,19 @@ function Result() {
           </p>
 
          {/*
-          {/* IMAGE */}
-          {showImage && (
-            <img
-              src="https://via.placeholder.com/600x300"
-              alt="summary visual"
-              style={{
-                marginTop: "25px",
-
-                width: "100%",
-                maxWidth: "100%",
-
-                borderRadius: "12px"
-              }}
-            />
-          )}
-          */}
+{showImage && (
+  <img
+    src="https://via.placeholder.com/600x300"
+    alt="summary visual"
+    style={{
+      marginTop: "25px",
+      width: "100%",
+      maxWidth: "100%",
+      borderRadius: "12px"
+    }}
+  />
+)}
+*/}
 
           {/* DOWNLOAD BUTTON */}
           <div
