@@ -18,12 +18,20 @@ export const login = async (email, password) => {
 export const uploadPDF = async (file, docType, token) => {
   const formData = new FormData();
   formData.append("file", file);
-  const res = await fetch(`${BASE_URL}/upload/pdf?doc_type=${docType}`, {
-    method: "POST",
-    headers: { "Authorization": `Bearer ${token}` },
-    body: formData
-  });
-  return res.json();
+  const res = await fetch(
+    `${BASE_URL}/upload/pdf?doc_type=${docType}`,
+    {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${token}`
+      },
+      body: formData
+    }
+  );
+  console.log("STATUS:", res.status);
+  const data = await res.json();
+  console.log("RESPONSE:", data);
+  return data;
 };
 export const getHistory = async (token) => {
   const res = await fetch(`${BASE_URL}/history/`, {
