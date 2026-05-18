@@ -43,14 +43,14 @@ function Login() {
 
       console.log(data);
 
-      if (data.access_token) {
-        localStorage.setItem(
-          "token",
-          data.access_token
-        );
+      if (data.token) {
+  localStorage.setItem(
+    "token",
+    data.token
+  );
 
-        navigate("/home");
-      } else {
+  navigate("/home");
+} else {
         alert(
           data.detail || "Login failed"
         );
