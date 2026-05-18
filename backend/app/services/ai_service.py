@@ -5,8 +5,7 @@ from app.config import settings
 client = genai.Client(api_key=settings.GEMINI_API_KEY)
 
 # Use lighter + faster model
-MODEL = "gemini-1.5-flash"
-
+MODEL = "gemini-1.5-flash-8b"
 
 def calculate_mcq_count(pages_data: list) -> int:
     total_words = 0
@@ -26,9 +25,9 @@ def get_content_from_pages(pages_data: list) -> str:
     total_chars = 0
 
     # Reduced limit for stability
-    MAX_CHARS = 30000
+    MAX_CHARS = 10000
 
-    for page in pages_data:
+    for page in pages_data[:5]:
 
         if page["text"]:
 
