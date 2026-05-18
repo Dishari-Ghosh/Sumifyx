@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { login } from "../api";
 
 function Login() {
   const navigate = useNavigate();
@@ -31,13 +32,35 @@ function Login() {
   }, []);
 
   // Handle Login
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (!email || !password) {
       alert("Please fill all fields");
       return;
     }
 
-    navigate("/home");
+    try {
+      const data = await login(email, password);
+
+      console.log(data);
+
+      if (data.access_token) {
+        localStorage.setItem(
+          "token",
+          data.access_token
+        );
+
+        navigate("/home");
+      } else {
+        alert(
+          data.detail || "Login failed"
+        );
+      }
+
+    } catch (error) {
+      console.error(error);
+
+      alert("Server error");
+    }
   };
 
   return (
