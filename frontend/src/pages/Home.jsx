@@ -2,6 +2,7 @@ import Header from "../components/Header";
 import UploadPDF from "../components/UploadPDF";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { uploadPDF } from "../api";
 
 function Home() {
   const navigate = useNavigate();
@@ -25,31 +26,48 @@ function Home() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const handleGenerate = () => {
+  /* GENERATE SUMMARY */
+  const handleGenerate = async () => {
     if (!pdfFile) {
       alert("Please upload a PDF!");
       return;
     }
 
-    setLoading(true);
+    try {
+      setLoading(true);
 
-    setTimeout(() => {
-      let inputText = "Content extracted from uploaded PDF";
-      let result = "Summary: " + inputText.slice(0, 60) + "...";
+      const token = localStorage.getItem("token");
 
-      const mcqs = "Generated MCQs will come here";
+      const response = await uploadPDF(
+        pdfFile,
+        purpose,
+        token
+      );
+
+      console.log("RESPONSE:", response);
 
       navigate("/result", {
         state: {
-          summary: result,
-          mcqs,
+          summary:
+            response.summary ||
+            "No summary generated",
+
+          mcqs:
+            response.mcqs ||
+            "No MCQs generated",
+
           purpose,
           darkMode
         }
       });
 
+    } catch (error) {
+      console.error(error);
+
+      alert("Failed to generate summary");
+    } finally {
       setLoading(false);
-    }, 1200);
+    }
   };
 
   return (
@@ -185,7 +203,6 @@ function Home() {
 
             padding: isMobile ? "14px" : "16px",
 
-            /* DIFFERENT COLORS */
             background: darkMode
               ? "linear-gradient(to right, #6366f1, #8b5cf6)"
               : "linear-gradient(to right, #ff91a4, #d05d74)",
