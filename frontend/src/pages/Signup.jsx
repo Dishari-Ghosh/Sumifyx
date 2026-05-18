@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { signup } from "../api";
 
 function Signup() {
   const navigate = useNavigate();
@@ -36,13 +37,30 @@ function Signup() {
   }, []);
 
   // Handle Signup
-  const handleSignup = () => {
+  const handleSignup = async () => {
     if (!name || !email || !password) {
       alert("Please fill all fields");
       return;
     }
 
-    navigate("/"); // go to login after signup
+    try {
+      const data = await signup(
+        name,
+        email,
+        password
+      );
+
+      console.log(data);
+
+      alert("Signup successful");
+
+      navigate("/");
+
+    } catch (error) {
+      console.error(error);
+
+      alert("Signup failed");
+    }
   };
 
   return (
