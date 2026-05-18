@@ -11,7 +11,12 @@ from datetime import datetime
 router = APIRouter(prefix="/upload", tags=["Upload"])
 security = HTTPBearer()
 
-VALID_DOC_TYPES = ["study_material", "research_paper", "business_paper", "patent"]
+VALID_DOC_TYPES = [
+    "study_material",
+    "research_paper",
+    "business_paper",
+    "patent"
+]
 
 
 @router.post("/pdf")
@@ -23,8 +28,12 @@ async def upload_pdf(
     # Verify JWT token
     token = credentials.credentials
     payload = decode_token(token)
+
     if not payload:
-        raise HTTPException(status_code=401, detail="Invalid or expired token")
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid or expired token"
+        )
 
     user_id = payload.get("sub")
 
@@ -37,49 +46,75 @@ async def upload_pdf(
 
     # Validate file
     if not is_valid_pdf(file.filename):
-        raise HTTPException(status_code=400, detail="Only PDF files are allowed")
+        raise HTTPException(
+            status_code=400,
+            detail="Only PDF files are allowed"
+        )
 
     # Save file temporarily
     file_bytes = await file.read()
+
     unique_filename = f"{uuid.uuid4()}_{file.filename}"
-    file_path = save_upload_file(file_bytes, unique_filename)
+
+    file_path = save_upload_file(
+        file_bytes,
+        unique_filename
+    )
 
     try:
-        # Step 1 - Parse PDF
+        print("STEP 1: Parsing PDF")
+
+        # Parse PDF
         parsed = parse_pdf(file_path)
 
-        # Step 2 - Collect all images from all pages
+        print("STEP 2: PDF Parsed Successfully")
+
+        # Collect image metadata only
+        # (avoid returning huge base64 data)
         all_images = []
+
         for page in parsed["pages"]:
             for img in page.get("images", []):
+
                 all_images.append({
-                    "page_number": img["page_number"],
-                    "image_index": img["image_index"],
-                    "ext": img["ext"],
-                    "data_uri": img["data_uri"]
+                    "page_number": img.get("page_number"),
+                    "image_index": img.get("image_index"),
+                    "ext": img.get("ext")
                 })
 
-        # Step 3 - Generate notes + MCQs using Gemini
+        print(f"STEP 3: Found {len(all_images)} images")
+
+        print("STEP 4: Starting Gemini generation")
+
+        # Generate notes + MCQs
         result = generate_notes(
             parsed["pages"],
             doc_type,
             parsed["total_pages"]
         )
 
-        # Step 4 - Save to MongoDB including images
+        print("STEP 5: Gemini generation completed")
+
+        # Save to MongoDB
         document = {
             "user_id": user_id,
             "filename": file.filename,
             "doc_type": doc_type,
             "total_pages": parsed["total_pages"],
-            "notes": result["notes"],
-            "mcqs": result["mcqs"],
-            "has_mcqs": result["has_mcqs"],
+            "notes": result.get("notes", ""),
+            "mcqs": result.get("mcqs", []),
+            "has_mcqs": result.get("has_mcqs", False),
             "mcq_count": result.get("mcq_count", 0),
-            "images": all_images,  # store images
+
+            # Save image metadata only
+            "images": all_images,
+
             "created_at": datetime.utcnow()
         }
+
         db["documents"].insert_one(document)
+
+        print("STEP 6: Saved to MongoDB")
 
         return {
             "message": "Notes generated successfully!",
@@ -87,13 +122,23 @@ async def upload_pdf(
             "doc_type": doc_type,
             "total_pages": parsed["total_pages"],
             "pages_covered": len(parsed["pages"]),
-            "notes": result["notes"],
-            "mcqs": result["mcqs"],
-            "has_mcqs": result["has_mcqs"],
+
+            "notes": result.get("notes", ""),
+            "mcqs": result.get("mcqs", []),
+            "has_mcqs": result.get("has_mcqs", False),
             "mcq_count": result.get("mcq_count", 0),
-            "total_images": len(all_images),
-            "images": all_images  # return images to frontend
+
+            # Only return count
+            "total_images": len(all_images)
         }
+
+    except Exception as e:
+        print("UPLOAD ERROR:", str(e))
+
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )
 
     finally:
         delete_file(file_path)
