@@ -127,6 +127,7 @@ function Result() {
             {summary || "No summary available"}
           </p>
 
+         {/*
           {/* IMAGE */}
           {showImage && (
             <img
@@ -142,6 +143,7 @@ function Result() {
               }}
             />
           )}
+          */}
 
           {/* DOWNLOAD BUTTON */}
           <div
