@@ -5,6 +5,7 @@ from app.config import settings
 client = Groq(api_key=settings.GROQ_API_KEY)
 MODEL = "llama-3.3-70b-versatile"
 
+
 def calculate_mcq_count(pages_data: list) -> int:
     total_words = 0
     for page in pages_data:
@@ -40,27 +41,38 @@ def get_content_from_pages(pages_data: list) -> str:
 
 
 def build_prompt(doc_type: str, content: str, mcq_count: int = 10) -> str:
+
     if doc_type == "study_material":
         return (
             "You are an expert academic note maker.\n\n"
-            "Below is study material extracted from a PDF.\n"
-            "Tasks:\n"
-            "1. Create structured notes.\n"
-            "2. Cover ALL important topics.\n"
-            "3. Use headings and subheadings.\n"
-            "4. Mention page references like (Page X).\n"
-            "5. Keep explanations concise but informative.\n"
-            f"6. Generate exactly {mcq_count} MCQs.\n\n"
-            "MCQ Format:\n"
-            "Q1. Question?\n"
-            "a) Option\n"
-            "b) Option\n"
-            "c) Option\n"
-            "d) Option\n"
-            "Answer: a)\n\n"
+            "Below is study material extracted from a PDF.\n\n"
+            "TASKS:\n"
+            "1. Create structured notes covering ALL topics.\n"
+            "2. Use headings and subheadings.\n"
+            "3. Mention page references like (Page X).\n"
+            "4. Keep explanations concise but informative.\n"
+            f"5. After the notes, generate exactly {mcq_count} MCQs.\n\n"
+            "IMPORTANT: Start the MCQ section with exactly this line:\n"
+            "Q1. [question here]\n\n"
+            "MCQ FORMAT (follow EXACTLY, each on its own line):\n"
+            "Q1. Question here?\n"
+            "a) Option one\n"
+            "b) Option two\n"
+            "c) Option three\n"
+            "d) Option four\n"
+            "Answer: a)\n"
+            "\n"
+            "Q2. Question here?\n"
+            "a) Option one\n"
+            "b) Option two\n"
+            "c) Option three\n"
+            "d) Option four\n"
+            "Answer: b)\n"
+            "\n"
             "PDF Content:\n"
             f"{content}"
         )
+
     elif doc_type == "research_paper":
         return (
             "You are an expert research paper summarizer.\n\n"
@@ -73,6 +85,7 @@ def build_prompt(doc_type: str, content: str, mcq_count: int = 10) -> str:
             "PDF Content:\n"
             f"{content}"
         )
+
     elif doc_type == "business_paper":
         return (
             "You are a business analyst.\n\n"
@@ -88,6 +101,7 @@ def build_prompt(doc_type: str, content: str, mcq_count: int = 10) -> str:
             "PDF Content:\n"
             f"{content}"
         )
+
     elif doc_type == "patent":
         return (
             "You are a patent analyst.\n\n"
@@ -103,6 +117,7 @@ def build_prompt(doc_type: str, content: str, mcq_count: int = 10) -> str:
             "PDF Content:\n"
             f"{content}"
         )
+
     else:
         return f"Summarize this content:\n{content}"
 
