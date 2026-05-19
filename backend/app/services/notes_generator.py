@@ -1,7 +1,7 @@
 from app.services.ai_service import (
     get_content_from_pages,
     build_prompt,
-    generate_with_gemini,
+    generate_with_groq,
     calculate_mcq_count
 )
 
