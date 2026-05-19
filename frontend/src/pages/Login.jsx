@@ -22,7 +22,10 @@ function Login() {
       setIsMobile(window.innerWidth < 768);
     };
 
-    window.addEventListener("resize", handleResize);
+    window.addEventListener(
+      "resize",
+      handleResize
+    );
 
     return () =>
       window.removeEventListener(
@@ -39,23 +42,31 @@ function Login() {
     }
 
     try {
-      const data = await login(email, password);
+      const data = await login(
+        email,
+        password
+      );
 
       console.log(data);
 
       if (data.token) {
-  localStorage.setItem(
-    "token",
-    data.token
-  );
+        localStorage.setItem(
+          "token",
+          data.token
+        );
 
-  navigate("/home");
-} else {
+        localStorage.setItem(
+          "user",
+          JSON.stringify(data.user)
+        );
+
+        navigate("/home");
+      } else {
         alert(
-          data.detail || "Login failed"
+          data.detail ||
+            "Login failed"
         );
       }
-
     } catch (error) {
       console.error(error);
 
@@ -104,7 +115,6 @@ function Login() {
             "0 8px 25px rgba(0,0,0,0.1)"
         }}
       >
-
         {/* LOGO */}
         <div
           style={{
@@ -116,7 +126,6 @@ function Login() {
           <img
             src="/logo.png"
             alt="logo"
-
             style={{
               width: isMobile
                 ? "130px"
@@ -165,15 +174,13 @@ function Login() {
 
           <input
             type="email"
-
             value={email}
-
             onChange={(e) =>
-              setEmail(e.target.value)
+              setEmail(
+                e.target.value
+              )
             }
-
             placeholder="Enter email"
-
             style={{
               ...inputStyle,
 
@@ -208,17 +215,13 @@ function Login() {
                 ? "text"
                 : "password"
             }
-
             value={password}
-
             onChange={(e) =>
               setPassword(
                 e.target.value
               )
             }
-
             placeholder="Enter password"
-
             style={{
               ...inputStyle,
 
@@ -290,7 +293,6 @@ function Login() {
           }}
         >
           Don’t have an account?{" "}
-
           <span
             onClick={() =>
               navigate("/signup")
@@ -306,43 +308,29 @@ function Login() {
             Signup
           </span>
         </p>
-
       </div>
     </div>
   );
 }
-
 // Input Style
 const inputStyle = {
   width: "100%",
-
   padding: "10px",
-
   marginTop: "5px",
-
   borderRadius: "8px",
-
   border: "1px solid #cbd5e1",
-
   outline: "none",
-
   boxSizing: "border-box"
 };
 
 // Button Style
 const buttonStyle = {
   width: "100%",
-
   background: "#2563eb",
-
   color: "#fff",
-
   border: "none",
-
   borderRadius: "8px",
-
   fontWeight: "bold",
-
   cursor: "pointer"
 };
 

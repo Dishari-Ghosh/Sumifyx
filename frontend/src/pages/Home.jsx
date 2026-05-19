@@ -8,7 +8,6 @@ function Home() {
   const navigate = useNavigate();
 
   const [purpose, setPurpose] = useState("study_material");
-  const [summaryType, setSummaryType] = useState("short");
   const [darkMode, setDarkMode] = useState(false);
   const [pdfFile, setPdfFile] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -48,19 +47,15 @@ function Home() {
 
       navigate("/result", {
         state: {
-          summary:
-            response.summary ||
-            "No summary generated",
-
-          mcqs:
-            response.mcqs ||
-            "No MCQs generated",
-
+          summary: response.notes || "No summary generated",
+          mcqs: response.mcqs || "",
+          images: response.images || [],
           purpose,
-          darkMode
+          darkMode,
+          total_pages: response.total_pages,
+          mcq_count: response.mcq_count
         }
       });
-
     } catch (error) {
       console.error(error);
 
@@ -91,7 +86,10 @@ function Home() {
       }}
     >
       {/* HEADER */}
-      <Header darkMode={darkMode} setDarkMode={setDarkMode} />
+      <Header
+        darkMode={darkMode}
+        setDarkMode={setDarkMode}
+      />
 
       {/* MAIN */}
       <div
@@ -105,10 +103,11 @@ function Home() {
 
           gap: isMobile ? "28px" : "40px",
 
-          padding: isMobile ? "25px 15px" : "40px 20px"
+          padding: isMobile
+            ? "25px 15px"
+            : "40px 20px"
         }}
       >
-
         {/* TITLE */}
         <h2
           style={{
@@ -147,19 +146,36 @@ function Home() {
 
             fontSize: isMobile ? "15px" : "17px",
 
-            background: darkMode ? "#1e293b" : "#ffffff",
-            color: darkMode ? "#ffffff" : "#000000",
+            background: darkMode
+              ? "#1e293b"
+              : "#ffffff",
+
+            color: darkMode
+              ? "#ffffff"
+              : "#000000",
 
             border: "none",
             outline: "none",
 
-            boxShadow: "0 4px 15px rgba(0,0,0,0.2)"
+            boxShadow:
+              "0 4px 15px rgba(0,0,0,0.2)"
           }}
         >
-          <option value="study_material">Study Material</option>
-          <option value="research_paper">Research Paper</option>
-          <option value="business_paper">Business Paper</option>
-          <option value="patent">Patent</option>
+          <option value="study_material">
+            Study Material
+          </option>
+
+          <option value="research_paper">
+            Research Paper
+          </option>
+
+          <option value="business_paper">
+            Business Paper
+          </option>
+
+          <option value="patent">
+            Patent
+          </option>
         </select>
 
         {/* UPLOAD BOX */}
@@ -168,7 +184,9 @@ function Home() {
             width: "90%",
             maxWidth: "650px",
 
-            minHeight: isMobile ? "200px" : "220px",
+            minHeight: isMobile
+              ? "200px"
+              : "220px",
 
             border: darkMode
               ? "2px dashed #64748b"
@@ -181,7 +199,9 @@ function Home() {
             justifyContent: "center",
             flexDirection: "column",
 
-            padding: isMobile ? "20px 15px" : "20px",
+            padding: isMobile
+              ? "20px 15px"
+              : "20px",
 
             /* GLASS EFFECT */
             background: darkMode
@@ -191,7 +211,10 @@ function Home() {
             backdropFilter: "blur(8px)"
           }}
         >
-          <UploadPDF darkMode={darkMode} setPdfFile={setPdfFile} />
+          <UploadPDF
+            darkMode={darkMode}
+            setPdfFile={setPdfFile}
+          />
         </div>
 
         {/* BUTTON */}
@@ -201,20 +224,26 @@ function Home() {
             width: "90%",
             maxWidth: "300px",
 
-            padding: isMobile ? "14px" : "16px",
+            padding: isMobile
+              ? "14px"
+              : "16px",
 
             background: darkMode
               ? "linear-gradient(to right, #6366f1, #8b5cf6)"
               : "linear-gradient(to right, #ff91a4, #d05d74)",
 
-            color: darkMode ? "#cbd5f5" : "#334155",
+            color: darkMode
+              ? "#cbd5f5"
+              : "#334155",
 
             border: "none",
             borderRadius: "12px",
 
             fontWeight: "bold",
 
-            fontSize: isMobile ? "16px" : "18px",
+            fontSize: isMobile
+              ? "16px"
+              : "18px",
 
             cursor: "pointer",
             opacity: loading ? 0.6 : 1
@@ -223,7 +252,6 @@ function Home() {
         >
           {loading ? "Processing..." : "SUMMARIZE"}
         </button>
-
       </div>
     </div>
   );
