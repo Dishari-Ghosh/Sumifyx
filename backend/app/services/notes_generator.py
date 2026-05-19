@@ -4,17 +4,11 @@ from app.services.ai_service import (
     generate_with_groq,
     calculate_mcq_count
 )
-
-
 def generate_notes(pages_data: list, doc_type: str, total_pages: int = 0) -> dict:
     content = get_content_from_pages(pages_data)
-    
-    # Dynamically calculate MCQ count based on actual content
     mcq_count = calculate_mcq_count(pages_data)
-    
     prompt = build_prompt(doc_type, content, mcq_count)
-    result = generate_with_gemini(prompt)
-
+    result = generate_with_groq(prompt)
     if doc_type == "study_material":
         if "Q1." in result:
             parts = result.split("Q1.")
